@@ -6,6 +6,6 @@ metadata:
   annotations:
     github.com/project-slug: ${{values.destination.owner + "/" + values.destination.repo}}
 spec:
-  type: service
+  type: website
   lifecycle: experimental
   owner: ${{values.owner | dump}}
