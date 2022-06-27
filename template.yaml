@@ -1,0 +1,125 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: react-template
+  title: React Template
+  description: Create a simple react microservice
+  tags:
+    - react
+    - frontend
+    - recommended
+spec:
+  owner: user:guest # Should be a team ID, that will link to one of the github auths.
+  type: service
+
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters: # The values that are going to be shown in the backstage frontend.
+    - title: Fill in some steps
+      required:
+        # - name
+        - component_id # A string defining the name of the component
+        - owner
+      properties:
+        # name:
+        #   title: Name
+        #   type: string
+        #   description: Unique name of the component
+        #   ui:autofocus: true
+        #   ui:options:
+        #     rows: 5
+        component_id:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:autofocus: true  
+        owner:
+          title: Owner
+          type: string
+          description: Unique name of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+    - title: Choose a location
+      required:
+        - repoUrl
+        - app_id
+        - cost_center
+        - team_name
+        - team_email_address
+        - department
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+        app_id:
+          title: Application ID
+          type: string
+          description: Application ID assigned on service
+          ui:autofocus: true
+        cost_center:
+          title: Cost Center
+          type: string
+          description: Cost Center of team
+        team_name:
+          title: Team Name
+          type: string
+          description: Name of the team that does the application
+        team_email_address:
+          title: Team Email Address
+          type: string
+          description: Team email address
+        department:
+          title: Department
+          type: string
+          description: Department that the application belongs to
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    # Each step executes an action, in this case one templates files into the working directory.
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          component_id: $ {{ parameters.component_id }}
+          owner: $ {{ parameters.owner }}
+          app_id: $ {{ parameters.app_id }}
+          cost_center: $ {{ parameters.cost_center }}
+          team_name: $ {{ parameters.team_name }}
+          team_email_address: $ {{ parameters.team_email_address }}
+          department: $ {{ parameters.department }}
+
+    # This step publishes the contents of the working directory to GitHub.
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: This is ${{ parameters.component_id }}
+        repoUrl: ${{ parameters.repoUrl }}
+
+    # The final step is to register our new component in the catalog.
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
