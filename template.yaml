@@ -45,7 +45,6 @@ spec:
     - title: Choose a location
       required:
         - repoUrl
-        - app_id
         - cost_center
         - team_name
         - team_email_address
@@ -58,11 +57,6 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
-        app_id:
-          title: Application ID
-          type: string
-          description: Application ID assigned on service
-          ui:autofocus: true
         cost_center:
           title: Cost Center
           type: string
@@ -92,7 +86,6 @@ spec:
         values:
           component_id: $ {{ parameters.component_id }}
           owner: $ {{ parameters.owner }}
-          app_id: $ {{ parameters.app_id }}
           cost_center: $ {{ parameters.cost_center }}
           team_name: $ {{ parameters.team_name }}
           team_email_address: $ {{ parameters.team_email_address }}
