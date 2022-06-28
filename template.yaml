@@ -22,13 +22,6 @@ spec:
         - component_id # A string defining the name of the component
         - owner
       properties:
-        # name:
-        #   title: Name
-        #   type: string
-        #   description: Unique name of the component
-        #   ui:autofocus: true
-        #   ui:options:
-        #     rows: 5
         component_id:
           title: Name
           type: string
@@ -37,18 +30,23 @@ spec:
         owner:
           title: Owner
           type: string
-          description: Unique name of the component
+          description: Owner of the component
           ui:field: OwnerPicker
           ui:options:
             allowedKinds:
               - Group
     - title: Choose a location
       required:
-        - repoUrl
-        - cost_center
-        - team_name
-        - team_email_address
+       - repoUrl
+        - app_id
         - department
+        - business_unit
+        - team_name
+        - cost_center
+        - team_email_address
+        - map_migrated
+        - environment
+        - data_confidentiality
       properties:
         repoUrl:
           title: Repository Location
@@ -57,22 +55,53 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
-        cost_center:
-          title: Cost Center
+              # - dev.azure.com
+        app_id:
+          title: Application ID
           type: string
-          description: Cost Center of team
-        team_name:
-          title: Team Name
-          type: string
-          description: Name of the team that does the application
-        team_email_address:
-          title: Team Email Address
-          type: string
-          description: Team email address
+          description: Application ID assigned on service
+          ui:autofocus: true
         department:
           title: Department
           type: string
           description: Department that the application belongs to
+        business_unit:
+          title: Business Unit
+          type: string
+          description: Business unit assigned on service
+        team_name:
+          title: Team Name
+          type: string
+          description: Name of the team that does the application
+        cost_center:
+          title: Cost Center
+          type: string
+          description: Cost Center of the team
+        team_email_address:
+          title: Team Email Address
+          type: string
+          description: Team email address
+        map_migrated:
+          title: Map Migrated
+          type: string
+          description: Tag for migrated services, used to earn service credits
+        environment:
+          title: Environment
+          type: string
+          description: Choose environment from the given options
+          enum:
+            - Dev
+            - UAT
+            - Prod
+        data_confidentiality:
+          title: Data Confidentiality
+          type: string
+          description: Choose from the given options
+          enum:
+            - Unrestricted
+            - Internal Only
+            - Confidential
+            - Secret
 
   # These steps are executed in the scaffolder backend, using data that we gathered
   # via the parameters above.
@@ -86,11 +115,15 @@ spec:
         values:
           component_id: $ {{ parameters.component_id }}
           owner: $ {{ parameters.owner }}
-          cost_center: $ {{ parameters.cost_center }}
-          team_name: $ {{ parameters.team_name }}
-          team_email_address: $ {{ parameters.team_email_address }}
+          app_id: $ {{ parameters.app_id }}
           department: $ {{ parameters.department }}
-
+          business_unit: $ {{ parameters.business_unit }}
+          team_name: $ {{ parameters.team_name }}
+          cost_center: $ {{ parameters.cost_center }}
+          team_email_address: $ {{ parameters.team_email_address }}
+          map_migrated: $ {{ parameters.map_migrated }}
+          environment: $ {{ parameters.environment }}
+          data_confidentiality: $ {{ parameters.data_confidentiality }}
     # This step publishes the contents of the working directory to GitHub.
     - id: publish
       name: Publish
